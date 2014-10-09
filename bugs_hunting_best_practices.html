@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>Blog | Bugs hunting. Best practices.</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"><link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"><link rel="stylesheet" href="http://yandex.st/highlightjs/7.5/styles/default.min.css"><link href="/stylesheets/main.css" rel="stylesheet"><link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'></head><body><div class="syn-about-panel"><div class="syn-author-img-w"><a href="/" class="syn-author-img"><img src="https://pbs.twimg.com/profile_images/3762256738/195f3ac721125b7d63e4bfeea53be9d2.jpeg"></img></a></div><div class="syn-author-info"><h3>Hi! My name is Sergey Sinica</h3><h4>And this is my blog</h4></div><div class="syn-social"><a href="https://twitter.com/ssinica" target="_blank"><i class="fa fa-twitter-square"></i></a><a href="https://github.com/ssinica" target="_blank"><i class="fa fa-github-square"></i></a><a href="https://plus.google.com/+SergeySinica" target="_blank"><i class="fa fa-google-plus-square"></i></a></div><div class="syn-about-me"><a href="https://twitter.com/ssinica" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @ssinica</a></div><div class="syn-tags-container"><a href="tag_thoughts.html" class="label syn-label-default">thoughts <span class="badge">1</span></a><a href="tag_dev.html" class="label syn-label-default">dev <span class="badge">1</span></a></div></div><div class="syn-main-panel"><div class="syn-blog-item"><div class="syn-post-header-w"><h1 class="syn-post-header"><a href="/bugs_hunting_best_practices.html">Bugs hunting. Best practices.</a> <small class="syn-blog-item-date">09-10-2014</small></h1></div><div class="syn-post"><div class="sect1">
+<h2 id="_so_you_found_a_bug">So you found a bug&#8230;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sorry guys for maybe not very correct post title. This story will be not actually about bugs hunting, but mostly about that to do after you found the bug.</p>
+</div>
+<div class="paragraph">
+<p>So you found a bug or got 500 Server Error exception. This is your project, but you are not only person working on it. What you should and should not to do?</p>
+</div>
+<div class="paragraph">
+<p><span class="label label-success">Rule 1</span>  <strong>Do not copy/paste exception to team chat immediately!</strong></p>
+</div>
+<div class="paragraph">
+<p>This is really bad tone. Instead try to track the exact place where exception was born. In most cases it will be really easy.</p>
+</div>
+<div class="paragraph">
+<p>Now look around. Do you understand that caused the exception? Can you fix it quickly and you are confident your fix will be correct? Super!</p>
+</div>
+<div class="paragraph">
+<p><span class="label label-success">Rule 2</span>  <strong>Go ahead and just fix it!</strong></p>
+</div>
+<div class="paragraph">
+<p>If you are not confident or you do not understand that happened, check commits history and find the person who last worked on this code. Contact that person and show him the problem. Ask him for help in resolving. In 99% times the person, if this is really his bug, will re-take the bug from you and will fix it himself.</p>
+</div>
+<div class="paragraph">
+<p>You see, you do not need to paste the exception in team chat in most cases.</p>
+</div>
+<div class="paragraph">
+<p>There are only <strong>3 excuses</strong> to do this:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>This is a critical production bug and you need immediate attention and help.</p>
+</li>
+<li>
+<p>You can not locate the person responsible for the bug.</p>
+</li>
+<li>
+<p>You have a solution for the bug and you want to show your team this problem as example of that can happen and how to avoid it. So if the bug can help someone in the team better understand the system and prevent similar bugs in future, then you should paste it in team chat with explanation.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>And last but not least. About copying exception for pasting to the chat.</p>
+</div>
+<div class="paragraph">
+<p><span class="label label-success">Rule 3</span>  <strong>Text of exception should clearly highlight the problem and point to the place exception happened.</strong></p>
+</div>
+<div class="paragraph">
+<p>So if there is a SQL syntax exception, do not paste just plain SQL, but also include stack trace of DAO or Service method which calls this SQL.</p>
+</div>
+<div class="paragraph">
+<p>You may want to paste the <strong>full stack trace</strong> just to be sure you have included all that is important. <strong>Do not do this!</strong></p>
+</div>
+<div class="paragraph">
+<p>If you are Java guy, then you know Java stack traces can be very, very long and meaningless. So just do not paste all this proxy/filter chaining methods. Look at the bottom of the stack trace. Usually the helpful part can be found there.</p>
+</div>
+<div class="paragraph">
+<p>So do not disturb your team with super easy to fix NPE. Do not point to someone&#8217;s mistake publicly and loudly.</p>
+</div>
+<div class="paragraph">
+<p>And happy hunting!</p>
+</div>
+</div>
+</div></div><div class="syn-blog-item-tags"><a href="tag_thoughts.html" class="label syn-label-default">thoughts</a><a href="tag_dev.html" class="label syn-label-default">dev</a></div><div class="syn-share-btns"><a href="https://twitter.com/share" data-url="http://blog.sinica.me/bugs_hunting_best_practices" class="twitter-share-button" data-via="ssinica">Tweet</a><div class="g-plus" data-href="http://blog.sinica.me/bugs_hunting_best_practices" data-action="share"></div></div></div></div><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script>var Blog = {};Blog.GA_TRACKING_ID = 'UA-29721532-1'; Blog.GA_DOMAIN = 'sinica.me';</script><script src="/js/main.js"></script></body></html>
