@@ -4,7 +4,7 @@
 <p>This post is a part of <a href="docker.html">series</a> about Docker.</p>
 </div>
 <div class="paragraph">
-<p>Few months ago I joined the team, which just started to develop a new project. The project was pretty much standard for Java world: Java 7, Maven, Jenkins, Tomcat, ESB (Enterprise Service Bus), PostgreSQL, etc&#8230;</p>
+<p>Few months ago I joined the team, which just started to develop a new project. The project was pretty standard for Java world: Java 7, Maven, Jenkins, Tomcat, ESB (Enterprise Service Bus), PostgreSQL, etc&#8230;</p>
 </div>
 <div class="paragraph">
 <p>When I started, the team already had the following:</p>
@@ -34,7 +34,7 @@
 <div class="ulist">
 <ul>
 <li>
-<p>There were few applications which were hard to configure. And each developer was forced to configure them individually on his development environment. So, of course, we had a WIKI page - "How to setup development environment", and no one know if the page was up to date;</p>
+<p>There were few applications hard to configure. And each developer was forced to configure them individually on his development environment. So, of course, we had a WIKI page - "How to setup development environment", and no one know if the page was up to date;</p>
 </li>
 <li>
 <p>Customer requested us to switch ESB implementation and the migration process seemed scary;</p>
@@ -48,7 +48,7 @@
 </ul>
 </div>
 <div class="paragraph">
-<p>And to resolve all these problems we decided to try the Docker. And I get the job :)</p>
+<p>And to resolve all these problems we decided to try Docker. And I get the job :)</p>
 </div>
 <div class="paragraph">
 <p>So, how Docker can help to resolve described problems?</p>
@@ -74,7 +74,7 @@
 <p>It is a lot easier to test and develop distributed systems. For example, you can run a cluster of MongoDB in one host and check how the data is distributed and replicated. Or you can run few web servers and load balancer and check how LB routes your requests.</p>
 </li>
 <li>
-<p>It is a lot easier to try things. You create a Docker image, play with it and throw away, and your host system keeps clean and calm.</p>
+<p>It is a lot easier to try things. You create a Docker image, play with it and throw away, and your host system stays clean and calm.</p>
 </li>
 </ul>
 </div>
@@ -84,13 +84,13 @@
 <div class="ulist">
 <ul>
 <li>
-<p>It should be really easy for others members in the team to start work with Docker. We did not want to force everybody in team to learn the Docker and became Docker experts;</p>
+<p>It should be really easy for others members in the team to start work with Docker. We did not want to force everybody in team to learn Docker and became Docker experts;</p>
 </li>
 <li>
-<p>The Docker integration should not break existing development process;</p>
+<p>Docker integration should not break existing development process;</p>
 </li>
 <li>
-<p>The Docker should be integrated into our existing Maven build;</p>
+<p>Docker should be integrated into our existing Maven build;</p>
 </li>
 <li>
 <p>We should have private Docker registry to store our images;</p>
