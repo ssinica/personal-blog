@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>Blog | Sergey Sinica</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"><link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"><link rel="stylesheet" href="http://yandex.st/highlightjs/7.5/styles/default.min.css"><link href="/assets/main.css" rel="stylesheet"><link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'></head><body><div class="syn-about-panel"><div class="syn-author-img-w"><a href="/" class="syn-author-img"><img src="https://pbs.twimg.com/profile_images/3762256738/195f3ac721125b7d63e4bfeea53be9d2.jpeg"></img></a></div><div class="syn-author-info"><h3>Hi and welcome to my blog!</h3></div><div class="syn-social"><a href="https://twitter.com/ssinica" target="_blank"><i class="fa fa-twitter-square"></i></a><a href="https://github.com/ssinica" target="_blank"><i class="fa fa-github-square"></i></a><a href="https://plus.google.com/+SergeySinica" target="_blank"><i class="fa fa-google-plus-square"></i></a></div><div class="syn-about-me"><a href="https://twitter.com/ssinica" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @ssinica</a></div><div class="syn-tags-container"><a href="tag_docker.html" class="label syn-label-default">docker <span class="badge">3</span></a><a href="tag_devops.html" class="label syn-label-default">devops <span class="badge">3</span></a><a href="tag_Raspberry_PI.html" class="label syn-label-default">Raspberry PI <span class="badge">2</span></a><a href="tag_dev.html" class="label syn-label-default">dev <span class="badge">2</span></a><a href="tag_thoughts.html" class="label syn-label-default">thoughts <span class="badge">1</span></a><a href="tag_time.html" class="label syn-label-default">time <span class="badge">1</span></a><a href="tag_life.html" class="label syn-label-default">life <span class="badge">1</span></a><a href="tag_software_enginering.html" class="label syn-label-default">software enginering <span class="badge">1</span></a><a href="tag_ec2.html" class="label syn-label-default">ec2 <span class="badge">1</span></a><a href="tag_CUPS.html" class="label syn-label-default">CUPS <span class="badge">1</span></a><a href="tag_Ubuntu.html" class="label syn-label-default">Ubuntu <span class="badge">1</span></a><a href="tag_git.html" class="label syn-label-default">git <span class="badge">1</span></a><a href="tag_blog.html" class="label syn-label-default">blog <span class="badge">1</span></a><a href="tag_best-practices.html" class="label syn-label-default">best-practices <span class="badge">1</span></a><a href="tag_cheatsheet.html" class="label syn-label-default">cheatsheet <span class="badge">1</span></a></div></div><div class="syn-main-panel"><div class="syn-blog-item"><h1><a href="/git-branching.html">GIT branching</a> <small class="syn-blog-item-date">10-08-2015</small></h1><div class="syn-post"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>I often see discussions about how to do branching in GIT properly. Rebase or not to rebase. Merge or not to merge. Use strict git-flow or use git-flow but with some exceptions and changes. And so on.</p>
+</div>
+<div class="paragraph">
+<p>I think in all these debates people forget about one most important thing - we, software engineers, should produce <strong>great</strong> software. Of course, you can blindly adopt git-flow or any other methodology and fanatically follow it&#8217;s rules. But I&#8217;m not sure that this will make your software great.</p>
+</div>
+<div class="paragraph">
+<p>To develop great software you should understand - <strong>WHY</strong> you do certain things and <strong>HOW</strong> they affects you. So, if you are using git-flow you should understand WHY you are using exactly this methodology (because it is very popular - incorrect answer) and HOW it impacts your development process and your product.</p>
+</div>
+<div class="paragraph">
+<p>For example. I worked in a big team. We had a lot of commits per deploy. The system was big, important and it generated money, so it was extremely important to deploy only <strong>CLEAN</strong> and <strong>VERIFIED</strong> code. Of course we have had automatic tests, manual tests, code reviews and leads all the time, in "daemon" mode, reviewed commits in master. Also if something very bad happened in PROD it was vital to find and fix problem quickly. So we must were able to clearly see which commits where added to particular deploy.</p>
+</div>
+<div class="paragraph">
+<p>When we switched from SVN to GIT, we initially did not have any rules HOW to do branching. But very quickly someone did mistake during merge and committed BAD code to master branch and this code hit PROD very badly. Leads spent few hours trying to understand in GIT commits history when things went wrong. Eventually problem was found and fixed, but it was not easy.</p>
+</div>
+<div class="paragraph">
+<p>After this incident we invented code reviews and one rule for branching and commits:</p>
+</div>
+<div class="paragraph">
+<p><strong>"NO MATTER THAT, BUT COMMITS HISTORY IN MASTER BRANCH SHOULD BE CLEAN AND LINEAR"</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Starting from that point we understood <strong>HOW</strong> we should do branching to produce great software and <strong>WHY</strong>.</p>
+</div>
+<div class="paragraph">
+<p>I really liked the idea with linear commits history in master branch and from then I tried to adapt it in all my next projects and jobs. But, unfortunately, not always this simple idea got positive response from other developers and managers. I think this happened because projects were relatively small - few developers and few dozens commits per deploy. Yes, sometimes it was tricky to understand from commits history when code was changed and who changed it first and merged with bug, but seems like this problem just was not big enough.</p>
+</div>
+<div class="paragraph">
+<p>In conclusion to make my point more clear simple example:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_branch_per_feature_with_simple_merge">Branch per feature with simple merge</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre>mkdir branches &amp;&amp; cd branches &amp;&amp; git init
+
+echo "111" &gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "111"
+
+git checkout -b 222 &amp;&amp; echo "222" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "222"
+git checkout master
+git checkout -b 333 &amp;&amp; echo "333" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "333"
+git checkout master
+
+echo "444" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "444"
+echo "555" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "555"
+
+git log --graph --oneline
+* 039460b 555
+* 4700e87 444
+* 89d4df7 111
+
+git checkout 222 &amp;&amp; echo "222-2" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "222-2"
+git merge master
+// fix conflicts
+git add * &amp;&amp; git commit -m "222-2"
+git checkout master &amp;&amp; git merge 222
+
+git log --graph --oneline
+*   9e8ce3a 222-2
+|\
+| * 039460b 555
+| * 4700e87 444
+* | f08bc09 222-2
+* | 041d76d 222
+|/
+* 89d4df7 111
+
+git checkout 333 &amp;&amp; echo "333-2" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "333-2"
+echo "333-3" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "333-3"
+git merge master
+// fix conflicts
+git add * &amp;&amp; git commit -m "333-3"
+git checkout master &amp;&amp; git merge 333
+
+git log --graph --oneline
+*   187de6d 333-3
+|\
+| *   9e8ce3a 222-2
+| |\
+| | * 039460b 555
+| | * 4700e87 444
+| * | f08bc09 222-2
+| * | 041d76d 222
+| |/
+* | be95c49 333-3
+* | e62e0d1 333-2
+* | 15b92cc 333
+|/
+* 89d4df7 111</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You see - just few feature branches merged to master branch. This is the simplest possible case, but already commits history is messy.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_branch_per_feature_with_squash_merge">Branch per feature with squash merge</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre>mkdir branches &amp;&amp; cd branches &amp;&amp; git init
+
+echo "111" &gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "111"
+
+git checkout -b 222 &amp;&amp; echo "222" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "222"
+git checkout master
+git checkout -b 333 &amp;&amp; echo "333" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "333"
+git checkout master
+
+echo "444" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "444"
+echo "555" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "555"
+
+git checkout 222 &amp;&amp; echo "222-2" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "222-2"
+git merge master
+// fix conflicts
+git add * &amp;&amp; git commit -m "222-2"
+git checkout master
+git merge --squash 222
+git add * &amp;&amp; git commit -m "222-2"
+
+git log --graph --oneline
+* 77db5e6 222-2
+* 45aff46 555
+* 0dbe89b 444
+* d8f1793 111
+
+git checkout 333 &amp;&amp; echo "333-2" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "333-2"
+echo "333-3" &gt;&gt; 111.txt &amp;&amp; git add * &amp;&amp; git commit -m "333-3"
+git merge master
+// fix conflicts
+git add * &amp;&amp; git commit -m "333-3"
+git checkout master &amp;&amp; git merge --squash 333
+git add * &amp;&amp; git commit -m "333-2"
+
+git log --graph --oneline
+* 8bced4a 333-2
+* 77db5e6 222-2
+* 45aff46 555
+* 0dbe89b 444
+* d8f1793 111</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The result is the same. But now we have linear and clean history. If you will tag commits before deploy, it will be trivial to review history of changes and track problems.</p>
+</div>
+<div class="paragraph">
+<p>Of course, you will say - with squash we loss some information about commits during feature development. Yes. But if you really need that history, you can always do multiple commits after squash merge.</p>
+</div>
+<div class="paragraph">
+<p>This is only one way how you can achieve linear commits history in master branch. You can try interactive rebase, deleting unnecessary branches after merge, etc&#8230;. Important is that now you understand which result you want to have and WHY. Now HOW question is really simple to answer.</p>
+</div>
+</div>
+</div></div><div class="syn-blog-item-tags"><a href="tag_git.html" class="label syn-label-default">git</a><a href="tag_best-practices.html" class="label syn-label-default">best-practices</a><a href="tag_software_enginering.html" class="label syn-label-default">software enginering</a></div><div class="syn-share-btns"><a href="https://twitter.com/share" data-url="http://blog.sinica.me/git-branching" class="twitter-share-button" data-via="ssinica">Tweet</a><div class="g-plus" data-href="http://blog.sinica.me/git-branching" data-action="share"></div></div></div><div class="syn-blog-item-delim"><span>54 days</span></div></div><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script>var Blog = {};Blog.GA_TRACKING_ID = 'UA-29721532-1'; Blog.GA_DOMAIN = 'sinica.me';</script><script src="/assets/main.js"></script></body></html>
