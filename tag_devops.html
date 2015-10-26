@@ -142,10 +142,10 @@ resource "aws_iam_policy_attachment" "external_admin_policy_attachment_to_extern
 </div>
 </div>
 <div class="paragraph">
-<p>So, here we register AWS provider for dev environment. We will use it explicitly in all other AWS resources.</p>
+<p>So, here we register AWS provider for dev environment. We use it explicitly in AWS resources definitions.</p>
 </div>
 <div class="paragraph">
-<p>We define a special role "ExternalAdminRole", which can be "assumed" from our main account. And we attach an administrator policy to that role. This means, that if someone from main account will "assume" "ExternalAdminRole", then he will be granted with administrator rights in dev account.</p>
+<p>We create a special role "ExternalAdminRole", which can be "assumed" from our main account. And we attach an administrator policy to that role. This means, that if someone from main account will "assume" "ExternalAdminRole", then he will be granted with administrator rights in dev account.</p>
 </div>
 </div>
 </div>
@@ -229,7 +229,7 @@ resource "aws_iam_group_membership" "dev_admins" {
 <p>Now, how bob can run Terraform against dev account?</p>
 </div>
 <div class="paragraph">
-<p>As it is stated in AWS documentation, bob should firstly assume the "ExternalAdminRole" by running following AWS CLI account:</p>
+<p>As it is stated in AWS documentation, bob should firstly assume the "ExternalAdminRole" by running following AWS CLI command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
