@@ -1,0 +1,311 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>Blog | AWS multi account setup with Terraform</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"><link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"><link rel="stylesheet" href="http://yandex.st/highlightjs/7.5/styles/default.min.css"><link href="/assets/main.css" rel="stylesheet"><link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'></head><body><div class="syn-about-panel"><div class="syn-author-img-w"><a href="/" class="syn-author-img"><img src="https://pbs.twimg.com/profile_images/3762256738/195f3ac721125b7d63e4bfeea53be9d2.jpeg"></img></a></div><div class="syn-author-info"><h3>Hi and welcome to my blog!</h3></div><div class="syn-social"><a href="https://twitter.com/ssinica" target="_blank"><i class="fa fa-twitter-square"></i></a><a href="https://github.com/ssinica" target="_blank"><i class="fa fa-github-square"></i></a><a href="https://plus.google.com/+SergeySinica" target="_blank"><i class="fa fa-google-plus-square"></i></a></div><div class="syn-about-me"><a href="https://twitter.com/ssinica" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @ssinica</a></div><div class="syn-tags-container"><a href="tag_devops.html" class="label syn-label-default">devops <span class="badge">4</span></a><a href="tag_docker.html" class="label syn-label-default">docker <span class="badge">3</span></a><a href="tag_Raspberry_PI.html" class="label syn-label-default">Raspberry PI <span class="badge">2</span></a><a href="tag_dev.html" class="label syn-label-default">dev <span class="badge">2</span></a><a href="tag_thoughts.html" class="label syn-label-default">thoughts <span class="badge">1</span></a><a href="tag_aws.html" class="label syn-label-default">aws <span class="badge">1</span></a><a href="tag_time.html" class="label syn-label-default">time <span class="badge">1</span></a><a href="tag_life.html" class="label syn-label-default">life <span class="badge">1</span></a><a href="tag_software_enginering.html" class="label syn-label-default">software enginering <span class="badge">1</span></a><a href="tag_ec2.html" class="label syn-label-default">ec2 <span class="badge">1</span></a><a href="tag_CUPS.html" class="label syn-label-default">CUPS <span class="badge">1</span></a><a href="tag_Ubuntu.html" class="label syn-label-default">Ubuntu <span class="badge">1</span></a><a href="tag_git.html" class="label syn-label-default">git <span class="badge">1</span></a><a href="tag_blog.html" class="label syn-label-default">blog <span class="badge">1</span></a><a href="tag_terraform.html" class="label syn-label-default">terraform <span class="badge">1</span></a><a href="tag_best-practices.html" class="label syn-label-default">best-practices <span class="badge">1</span></a><a href="tag_cheatsheet.html" class="label syn-label-default">cheatsheet <span class="badge">1</span></a></div></div><div class="syn-main-panel"><div class="syn-blog-item"><div class="syn-post-header-w"><h1 class="syn-post-header"><a href="/aws_multi_account_with_terraform.html">AWS multi account setup with Terraform</a> <small class="syn-blog-item-date">24-10-2015</small></h1></div><div class="syn-post"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are going to create an environment with 2 separate AWS accounts.</p>
+</div>
+<div class="paragraph">
+<p>First account will be the main one, the gateway to other accounts. This account will contain all our IAM users and roles.</p>
+</div>
+<div class="paragraph">
+<p>Second account will be the actual workhorse with instances, VPC, etc..</p>
+</div>
+<div class="paragraph">
+<p>See an official <a href="http://docs.aws.amazon.com/IAM/latest/UserGuide/walkthru_cross-account-with-roles.html">guide</a> in AWS documentation with similar setup.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_why">Why?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This post is greatly inspired by <a href="https://segment.com/blog/rebuilding-our-infrastructure">excellent blog</a> from Segment, about how they rethought and rebuild their AWS infrastructure and why. I advise you to read their blog before continue, but in short&#8230;.</p>
+</div>
+<div class="paragraph">
+<p>By using several AWS accounts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>You can separate and group your resources in natural and simple way;</p>
+</li>
+<li>
+<p>You can truly isolate different projects or environments, but still have possibility to manage access rights in one central location;</p>
+</li>
+<li>
+<p>By setting up consolidated billing you can review and manage costs across projects and environments in clear way;</p>
+</li>
+<li>
+<p>If one of your projects will be bought by Google, then it will be trivial to change ownership of project and pass it to new owner;</p>
+</li>
+<li>
+<p>And a small but pleasant bonus: each new account you will create is eligible for free usage tier. 5 accounts &#8658; 5 free t2.micro instances for a year. Nice!</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_before_you_start">Before you start</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You should have 2 AWS accounts. Let&#8217;s name first - "main", and second - "dev". In each account create a user with administrator rights. Write down access credentials. We will use these users to access AWS from Terraform.</p>
+</div>
+<div class="paragraph">
+<p>Also you need to know AWS accounts ids.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s define a variables:</p>
+</div>
+<div class="listingblock">
+<div class="title">variables.tf</div>
+<div class="content">
+<pre class="highlight"><code>variable "main_account_id" {}
+variable "main_access_key" {}
+variable "main_secret_key" {}
+
+variable "dev_account_id" {}
+variable "dev_access_key" {}
+variable "dev_secret_key" {}
+
+variable "aws_region" {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please, refer to Terraform <a href="https://terraform.io/docs/configuration/variables.html">documentation</a> about how to pass values for these variables.</p>
+</div>
+<div class="paragraph">
+<p>Obviously, you need to install Terraform to proceed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setup_dev_account">Setup dev account</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">dev.tf</div>
+<div class="content">
+<pre class="highlight"><code># setup aws provider for dev account
+provider "aws" {
+  alias = "dev"
+  region = "${var.aws_region}"
+  access_key = "${var.dev_access_key}"
+  secret_key = "${var.dev_secret_key}"
+}
+
+# in dev account create iam policy, which will grants admin rights
+resource "aws_iam_policy" "external_admin_policy" {
+    provider = "aws.dev"
+    name = "ExternalAdminPolicy"
+    path = "/"
+    policy = &lt;&lt;EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "*",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+# in dev account create a role which can be assumed by main account
+resource "aws_iam_role" "external_admin_role" {
+    provider = "aws.dev"
+    name = "ExternalAdminRole"
+    assume_role_policy = &lt;&lt;EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${var.main_account_id}:root"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# attach policy to role
+resource "aws_iam_policy_attachment" "external_admin_policy_attachment_to_external_admin_role" {
+    provider = "aws.dev"
+    name = "external_admin_policy_attachment"
+    roles = ["${aws_iam_role.external_admin_role.name}"]
+    policy_arn = "${aws_iam_policy.external_admin_policy.arn}"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, here we register AWS provider for dev environment. We will use it explicitly in all other AWS resources.</p>
+</div>
+<div class="paragraph">
+<p>We define a special role "ExternalAdminRole", which can be "assumed" from our main account. And we attach an administrator policy to that role. This means, that if someone from main account will "assume" "ExternalAdminRole", then he will be granted with administrator rights in dev account.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setup_main_account">Setup main account</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">main.tf</div>
+<div class="content">
+<pre class="highlight"><code># setup aws provider for main account
+provider "aws" {
+    alias = "main"
+    region = "${var.aws_region}"
+    access_key = "${var.main_access_key}"
+    secret_key = "${var.main_secret_key}"
+}
+
+# create a group, which will be able to assume "ExternalAdminRole" from dev account
+resource "aws_iam_group" "dev_admins" {
+    provider = "aws.main"
+    name = "DevAdminsGroup"
+}
+
+# create a group policy, which allows to assume "ExternalAdminRole"
+resource "aws_iam_group_policy" "dev_admins_policy" {
+    provider = "aws.main"
+    name = "DevAdminsPolicy"
+    group = "${aws_iam_group.dev_admins.id}"
+    policy = &lt;&lt;EOF
+{
+    "Version": "2012-10-17",
+    "Statement": {
+        "Effect": "Allow",
+        "Action": "sts:AssumeRole",
+        "Resource": "${aws_iam_role.external_admin_role.arn}"
+    }
+}
+EOF
+}
+
+# create a user "bob"
+resource "aws_iam_user" "bob" {
+    provider = "aws.main"
+    name = "bob"
+}
+
+# add "bob" to dev_admins group
+resource "aws_iam_group_membership" "dev_admins" {
+    provider = "aws.main"
+    name = "dev_admins_group_membership"
+    users = [
+        "${aws_iam_user.bob.name}"
+    ]
+    group = "${aws_iam_group.dev_admins.name}"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here we define a group, members of which can "assume" "ExternalAdminRole". Also we create an IAM user "bob".</p>
+</div>
+<div class="paragraph">
+<p>So now we have a user bob in main account. You can allow bob to login to main account&#8217;s AWS Console. But bob isn&#8217;t allowed to do anything inside main account - he can&#8217;t launch instances or view billing information, etc&#8230; All he can do - he can assume "ExternalAdminRole" and get admin rights for dev account.</p>
+</div>
+<div class="paragraph">
+<p>Bob can login into dev account thru main account using the following URL:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>https://signin.aws.amazon.com/switchrole?account=[dev_account_id]&amp;roleName=ExternalAdminRole</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_work_with_dev_account">How to work with dev account?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s assume that we have a different project, which wants to use dev account to setup some applications in it. So the project has it&#8217;s own Terraform scripts to create VPC, start instances, etc&#8230;</p>
+</div>
+<div class="paragraph">
+<p>Now, how bob can run Terraform against dev account?</p>
+</div>
+<div class="paragraph">
+<p>As it is stated in AWS documentation, bob should firstly assume the "ExternalAdminRole" by running following AWS CLI account:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>aws sts assume-role --role-arn "arn:aws:iam::[dev_account_id]:role/ExternalAdminRole" --role-session-name "bob_dev"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command will return temporal access keys for dev account, which will look something like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+    "Credentials": {
+        "SecretAccessKey": "111111111111111111",
+        "SessionToken": "222222222222222222222,
+        "Expiration": "2014-12-11T23:08:07Z",
+        "AccessKeyId": "33333333333333333333"
+    }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Terraform right now doesn&#8217;t support authentication against AWS provider by "assuming" roles. So before running Terraform you need to get these temporal credentials and use them against Terraform.</p>
+</div>
+<div class="paragraph">
+<p>One of the ways to configure AWS provider in Terraform is by using environment variables. So you just skip credential variables in AWS provider configuration, assuming that they will be passed thru environment variables. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>provider "aws" {
+    region = "${var.aws_region}"
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And use some wrapper script for Terraform commands. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">assume_dev_admin.sh</div>
+<div class="content">
+<pre class="highlight"><code class="bash language-bash">#!/bin/bash
+
+CMD="$@"
+DEV_ACCOUNT_ID=11111111111
+
+ASSUME_ROLE="arn:aws:iam::${DEV_ACCOUNT_ID}:role/ExternalAdminRole"
+ROLE_SESSION_NAME="dev"
+TMP_FILE=".temp_credentials"
+
+aws sts assume-role --output json --role-arn ${ASSUME_ROLE} --role-session-name ${ROLE_SESSION_NAME} &gt; ${TMP_FILE}
+
+ACCESS_KEY=$(cat ${TMP_FILE} | jq -r ".Credentials.AccessKeyId")
+SECRET_KEY=$(cat ${TMP_FILE} | jq -r ".Credentials.SecretAccessKey")
+SESSION_TOKEN=$(cat ${TMP_FILE} | jq -r ".Credentials.SessionToken")
+EXPIRATION=$(cat ${TMP_FILE} | jq -r ".Credentials.Expiration")
+
+echo "Retrieved temp access key ${ACCESS_KEY} for role ${ASSUME_ROLE}. Key will expire at ${EXPIRATION}"
+
+AWS_ACCESS_KEY_ID=${ACCESS_KEY} AWS_SECRET_ACCESS_KEY=${SECRET_KEY} AWS_SESSION_TOKEN=${SESSION_TOKEN} ${CMD}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now to apply Terraform bob should run (assuming that he is configured AWS credentials for main account):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>./assume_dev_admin.sh terraform apply</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_final_words">Final words</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is a very basic recipe. But it should give you a good start point if you will decide that multi AWS account setup is right for you. I hope this will help someone and will save some hours.</p>
+</div>
+</div>
+</div></div><div class="syn-blog-item-tags"><a href="tag_aws.html" class="label syn-label-default">aws</a><a href="tag_terraform.html" class="label syn-label-default">terraform</a><a href="tag_devops.html" class="label syn-label-default">devops</a></div><div class="syn-share-btns"><a href="https://twitter.com/share" data-url="http://blog.sinica.me/aws_multi_account_with_terraform" class="twitter-share-button" data-via="ssinica">Tweet</a><div class="g-plus" data-href="http://blog.sinica.me/aws_multi_account_with_terraform" data-action="share"></div></div></div></div><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script>var Blog = {};Blog.GA_TRACKING_ID = 'UA-29721532-1'; Blog.GA_DOMAIN = 'sinica.me';</script><script src="/assets/main.js"></script></body></html>
