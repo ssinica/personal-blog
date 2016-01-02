@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>Blog | Free dynamic DNS from noip.com with Docker</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"><link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"><link rel="stylesheet" href="http://yandex.st/highlightjs/7.5/styles/default.min.css"><link href="/assets/main.css" rel="stylesheet"><link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'></head><body><div class="syn-about-panel"><div class="syn-author-img-w"><a href="/" class="syn-author-img"><img src="https://pbs.twimg.com/profile_images/3762256738/195f3ac721125b7d63e4bfeea53be9d2.jpeg"></img></a></div><div class="syn-author-info"><h3>Hi and welcome to my blog!</h3></div><div class="syn-social"><a href="https://twitter.com/ssinica" target="_blank"><i class="fa fa-twitter-square"></i></a><a href="https://github.com/ssinica" target="_blank"><i class="fa fa-github-square"></i></a><a href="https://plus.google.com/+SergeySinica" target="_blank"><i class="fa fa-google-plus-square"></i></a></div><div class="syn-about-me"><a href="https://twitter.com/ssinica" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @ssinica</a></div><div class="syn-tags-container"><a href="tag_devops.html" class="label syn-label-default">devops <span class="badge">4</span></a><a href="tag_docker.html" class="label syn-label-default">docker <span class="badge">3</span></a><a href="tag_dev.html" class="label syn-label-default">dev <span class="badge">3</span></a><a href="tag_Raspberry_PI.html" class="label syn-label-default">Raspberry PI <span class="badge">2</span></a><a href="tag_aws.html" class="label syn-label-default">aws <span class="badge">2</span></a><a href="tag_AngularJS.html" class="label syn-label-default">AngularJS <span class="badge">1</span></a><a href="tag_howto.html" class="label syn-label-default">howto <span class="badge">1</span></a><a href="tag_RequireJS.html" class="label syn-label-default">RequireJS <span class="badge">1</span></a><a href="tag_CUPS.html" class="label syn-label-default">CUPS <span class="badge">1</span></a><a href="tag_git.html" class="label syn-label-default">git <span class="badge">1</span></a><a href="tag_Docker.html" class="label syn-label-default">Docker <span class="badge">1</span></a><a href="tag_inline_skating.html" class="label syn-label-default">inline skating <span class="badge">1</span></a><a href="tag_terraform.html" class="label syn-label-default">terraform <span class="badge">1</span></a><a href="tag_misc.html" class="label syn-label-default">misc <span class="badge">1</span></a></div></div><div class="syn-main-panel"><div class="syn-blog-item"><div class="syn-post-header-w"><h1 class="syn-post-header"><a href="/noip_free_dns_with_docker.html">Free dynamic DNS from noip.com with Docker</a> <small class="syn-blog-item-date">02-01-2016</small></h1></div><div class="syn-post"><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is instructions how to setup <a href="http://www.noip.com">dynamic DNS</a> on Ubuntu 14.04 using <a href="https://docker.com">Docker</a>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Register with <a href="http://www.noip.com">http://www.noip.com</a></p>
+</li>
+<li>
+<p>Create new host (<code>hostname.ddns.net</code>) at <a href="http://www.noip.com/members/dns/">http://www.noip.com/members/dns/</a></p>
+</li>
+<li>
+<p><a href="https://docs.docker.com/engine/installation/ubuntulinux/">Install</a> Docker</p>
+<div class="listingblock">
+<div class="content">
+<pre>sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+sudo echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" &gt; /etc/apt/sources.list.d/docker.list
+sudo apt-get update
+sudo apt-get install linux-image-extra-$(uname -r)
+sudo apt-get install docker-engine</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create directory which will contain configuration file for Docker container</p>
+<div class="listingblock">
+<div class="content">
+<pre>sudo mkdir /config</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Start Docker container from <a href="https://github.com/coppit/docker-no-ip">image</a></p>
+<div class="listingblock">
+<div class="content">
+<pre>sudo docker run --name=noip -d -v /etc/localtime:/etc/localtime -v /config:/config coppit/no-ip</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Edit file <code>/config/noip.conf</code></p>
+</li>
+<li>
+<p>Start container one more time</p>
+<div class="listingblock">
+<div class="content">
+<pre>sudo docker start noip</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Check if it is working</p>
+<div class="listingblock">
+<div class="content">
+<pre>sudo docker logs noip</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div></div><div class="syn-blog-item-tags"><a href="tag_Docker.html" class="label syn-label-default">Docker</a><a href="tag_howto.html" class="label syn-label-default">howto</a></div><div class="syn-share-btns"><a href="https://twitter.com/share" data-url="http://blog.sinica.me/noip_free_dns_with_docker" class="twitter-share-button" data-via="ssinica">Tweet</a><div class="g-plus" data-href="http://blog.sinica.me/noip_free_dns_with_docker" data-action="share"></div></div></div></div><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script><script src="http://yandex.st/highlightjs/7.5/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><script>var Blog = {};Blog.GA_TRACKING_ID = 'UA-29721532-1'; Blog.GA_DOMAIN = 'sinica.me';</script><script src="/assets/main.js"></script></body></html>
